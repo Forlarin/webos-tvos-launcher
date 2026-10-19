@@ -9,9 +9,19 @@ is **not** covered by that licence.
 | Component | Licence | Where |
 |---|---|---|
 | [Preact](https://preactjs.com) | MIT, © Jason Miller | compiled into `assets/app.js`; licence text in [public/licenses/preact-MIT.txt](public/licenses/preact-MIT.txt) |
-| [Inter](https://rsms.me/inter/) typeface | SIL Open Font License 1.1, © The Inter Project Authors | `src/assets/inter-latin-wght.woff2`; licence text in [public/licenses/Inter-OFL.txt](public/licenses/Inter-OFL.txt) |
+| [Inter](https://rsms.me/inter/) typeface (static weights via [@fontsource/inter](https://fontsource.org/fonts/inter)) | SIL Open Font License 1.1, © The Inter Project Authors | bundled as `assets/inter-latin-*.woff2`; licence text in [public/licenses/Inter-OFL.txt](public/licenses/Inter-OFL.txt) |
 
 Both licence texts are included in the installed app under `licenses/`.
+
+## NASA images
+
+The photo wallpapers (`public/wallpapers/`) and profile pictures (`public/avatars/`) are
+NASA images, which are generally not subject to copyright in the United States. Sources
+and NASA Image and Video Library IDs are listed in
+[public/wallpapers/CREDITS.txt](public/wallpapers/CREDITS.txt). NASA does not endorse
+this project. "Today's NASA Picture" shows NASA's Astronomy Picture of the Day, loaded
+from science.nasa.gov at run time and not redistributed; some APOD images are copyrighted
+by their photographers.
 
 ## App and input icons
 

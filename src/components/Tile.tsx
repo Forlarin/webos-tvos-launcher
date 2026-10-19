@@ -10,13 +10,21 @@ export interface TileModel {
 	glyphImageUrl?: string;
 	/** built-in vector icon */
 	glyph?: GlyphName;
-	/** monogram background when there is no artwork */
+	/** wordmark background when there is no artwork */
 	color?: string;
+	/** wordmark text colour */
+	fg?: string;
+	/** brand colour for the top-shelf wash */
+	brand?: string;
+	/** one line under the name (top shelf; wide cards) */
+	subtitle?: string;
 }
 
 interface Props {
 	model: TileModel;
 	focused: boolean;
+	/** next to the focused tile (magnifying-dock lift) */
+	near?: boolean;
 	/** picked up in re-order mode */
 	lifted?: boolean;
 	/** shown with a tick badge (settings picker) */
@@ -27,8 +35,8 @@ interface Props {
 	onActivate?: () => void;
 }
 
-export function Tile ({model, focused, lifted, checked, dimmed, onHover, onActivate}: Props) {
-	const classes = ['tile', focused && 'tile--focused', lifted && 'tile--lifted', dimmed && 'tile--dimmed'].filter(Boolean).join(' ');
+export function Tile ({model, focused, near, lifted, checked, dimmed, onHover, onActivate}: Props) {
+	const classes = ['tile', focused && 'tile--focused', near && 'tile--near', lifted && 'tile--lifted', dimmed && 'tile--dimmed'].filter(Boolean).join(' ');
 	return (
 		<div class={classes} onMouseEnter={onHover} onClick={onActivate}>
 			<div class="tile__box" style={model.color && !model.imageUrl ? {background: model.color} : undefined}>
@@ -38,7 +46,7 @@ export function Tile ({model, focused, lifted, checked, dimmed, onHover, onActiv
 						? <img class="tile__image tile__image--glyph" src={model.glyphImageUrl} alt="" />
 						: model.glyph
 							? <Glyph name={model.glyph} />
-							: <div class="tile__monogram">{model.label.charAt(0).toUpperCase()}</div>}
+							: <div class={`tile__wordmark${model.label.length > 8 ? ' tile__wordmark--long' : ''}`} style={model.fg ? {color: model.fg} : undefined}>{model.label}</div>}
 				{checked && <div class="tile__badge"><CheckMark /></div>}
 			</div>
 			<div class="tile__label">{model.label}</div>

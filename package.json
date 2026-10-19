@@ -1,6 +1,6 @@
 {
   "name": "webos-launcher",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "description": "Minimalist home-screen launcher for LG webOS TVs (webOS 6 / Chrome 79 compatible)",
   "type": "module",
@@ -10,7 +10,10 @@
     "package": "sh scripts/package.sh",
     "install:tv": "sh scripts/install.sh",
     "deploy": "npm run build && npm run package && npm run install:tv",
-    "manifest": "node scripts/gen-manifest.mjs"
+    "manifest": "node scripts/gen-manifest.mjs",
+    "install:devmode": "sh scripts/install-tv.sh",
+    "backup": "node scripts/settings.mjs backup",
+    "restore": "node scripts/settings.mjs restore"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
@@ -19,6 +22,7 @@
     "vite": "^5.4.21"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
     "preact": "^10.29.8"
   },
   "license": "MIT"

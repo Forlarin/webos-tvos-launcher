@@ -34,7 +34,7 @@ jobs:
       - name: Check bundle has no ES2020+ syntax
         run: |
           if grep -qE '\?\.[A-Za-z_$(\[]|\?\?' dist/assets/app.js; then
-            echo "dist/assets/app.js contains syntax Chrome 79 cannot parse" >&2
+            echo "dist/assets/app.js contains syntax Chrome 53 cannot parse" >&2
             exit 1
           fi
 

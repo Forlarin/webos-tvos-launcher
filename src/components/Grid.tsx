@@ -15,7 +15,7 @@ interface Props {
 	onActivate: (index: number) => void;
 }
 
-const VIEWPORT_HEIGHT = 720;          // matches .grid__viewport height in global.css
+const VIEWPORT_HEIGHT = 640;          // matches .grid__viewport height in global.css
 const LABEL_HEIGHT = 60;              // two-line tile label + its top margin (see .tile__label)
 const GRID_ROW_GAP = 40;              // matches .grid__track grid-row-gap
 const ROW_STEP = LAYOUT.tileSize + LABEL_HEIGHT + GRID_ROW_GAP;

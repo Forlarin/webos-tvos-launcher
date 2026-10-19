@@ -1,0 +1,17 @@
+Photo wallpapers: NASA. NASA imagery is generally not subject to copyright in the
+United States (https://www.nasa.gov/nasa-brand-center/images-and-media/). Cropped or
+padded to 1920x1080. Source records on the NASA Image and Video Library
+(https://images.nasa.gov/details/<id>):
+
+nasa-carina.jpg      carina_nebula                    Webb NIRCam "Cosmic Cliffs" in the Carina Nebula (NASA, ESA, CSA, STScI)
+nasa-aurora.jpg      iss072e159172                    The aurora borealis blankets the Earth (ISS, JSC)
+nasa-bluemarble.jpg  GSFC_20171208_Archive_e001386    Blue Marble 2012 (GSFC)
+nasa-eagle.jpg       PIA25433                         The Eagle Nebula observed by WISE (JPL)
+nasa-helix.jpg       PIA15658                         NGC 7293, the Helix Nebula (JPL)
+nasa-galaxy.jpg      GSFC_20171208_Archive_e000158    Hubble spies spiral galaxy (GSFC)
+
+Profile pictures (public/avatars/, 240x240 crops), NASA Image and Video Library IDs:
+earth GSFC_20171208_Archive_e001386 · moon PIA00405 · mars PIA00407 · jupiter PIA02873 ·
+saturn PIA11141 · neptune PIA01492 · uranus PIA18182 · mercury PIA16853 · pluto PIA19952 ·
+sun PIA26681 · io PIA02308 · titan PIA20016 · callisto PIA03456 · carina carina_nebula ·
+helix PIA15658 · galaxy GSFC_20171208_Archive_e000158 · aurora iss072e159172

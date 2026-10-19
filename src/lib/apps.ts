@@ -13,14 +13,20 @@ import {isWebOS, lunaCall, type LunaResponse} from './luna';
 import {appExists} from './launch';
 
 export interface AppEntry {
+	/** the ID installed on this TV (launch with this) */
 	id: string;
+	/** every ID this app is known by, so saved docks match whichever one is installed */
+	aliases: string[];
 	title: string;
 	/** image URL (relative asset path or data: URI); undefined → monogram */
 	iconUrl?: string;
 	color?: string;
+	fg?: string;
+	brand?: string;
+	tagline?: string;
 }
 
-export type AppSource = 'catalog' | 'homebrew';
+export type AppSource = 'catalog' | 'launchpoints' | 'homebrew';
 
 export interface AppList {
 	apps: AppEntry[];
@@ -32,7 +38,11 @@ const ICON_DIR = 'icons/apps/';
 
 export function listApps (useHomebrew: boolean): Promise<AppList> {
 	if (!isWebOS()) return Promise.resolve({apps: catalogEntries(APP_CATALOG), source: 'catalog'});
-	const catalog = () => listViaCatalog().then((apps): AppList => ({apps, source: 'catalog'}));
+	// Without root: ask for LG's own launcher list (allowed on some firmware), else the
+	// catalogue filtered by what's installed.
+	const catalog = () => listViaLaunchPoints()
+		.then((apps): AppList => ({apps, source: 'launchpoints'}))
+		.catch(() => listViaCatalog().then((apps): AppList => ({apps, source: 'catalog'})));
 	if (!useHomebrew) return catalog();
 	return listViaHomebrew()
 		.then((apps): AppList => ({apps, source: 'homebrew'}))
@@ -41,18 +51,75 @@ export function listApps (useHomebrew: boolean): Promise<AppList> {
 
 // ---------- provider 1: catalogue ----------
 
-function catalogEntries (apps: CatalogApp[]): AppEntry[] {
-	return apps.map((a) => ({
-		id: a.id,
+function idsOf (a: CatalogApp): string[] {
+	return [a.id].concat(a.altIds || []);
+}
+
+function catalogEntry (a: CatalogApp, installedId: string = a.id): AppEntry {
+	return {
+		id: installedId,
+		aliases: idsOf(a),
 		title: a.title,
 		iconUrl: a.icon ? ICON_DIR + a.icon : undefined,
-		color: a.color
-	}));
+		color: a.color,
+		fg: a.fg,
+		brand: a.brand || a.color,
+		tagline: a.tagline
+	};
+}
+
+function catalogEntries (apps: CatalogApp[]): AppEntry[] {
+	return apps.map((a) => catalogEntry(a));
+}
+
+/** The catalogue entry for an installed ID, matching alternate IDs too. */
+function findCatalog (id: string): CatalogApp | undefined {
+	for (const a of APP_CATALOG) if (idsOf(a).indexOf(id) !== -1) return a;
+	return undefined;
+}
+
+/** First installed ID of a catalogue app, or null. */
+function installedIdOf (a: CatalogApp): Promise<string | null> {
+	const ids = idsOf(a);
+	return Promise.all(ids.map(appExists)).then((present) => {
+		for (let i = 0; i < ids.length; i++) if (present[i]) return ids[i];
+		return null;
+	});
 }
 
 function listViaCatalog (): Promise<AppEntry[]> {
-	return Promise.all(APP_CATALOG.map((a) => appExists(a.id)))
-		.then((present) => catalogEntries(APP_CATALOG.filter((_, i) => present[i])));
+	return Promise.all(APP_CATALOG.map(installedIdOf)).then((installed) => {
+		const out: AppEntry[] = [];
+		APP_CATALOG.forEach((a, i) => { const id = installed[i]; if (id) out.push(catalogEntry(a, id)); });
+		return out;
+	});
+}
+
+// ---------- LG's launch points, where a web app may read them ----------
+
+/** LG system entries that aren't apps anyone opens from a launcher. */
+const SKIP_LAUNCHPOINT = /^com\.webos\.app\.(hdmi|livetv|home|discovery|inputcommon|acr|factory|care|sdk|store-demo|tvhotkey)|^com\.webos\.exampleapp/;
+
+function listViaLaunchPoints (): Promise<AppEntry[]> {
+	return lunaCall<{launchPoints?: LaunchPoint[]}>(LUNA.listLaunchPoints, {}, 2500).then((r) => {
+		const points = (r.launchPoints || []).filter((p) => p.id && p.title && HIDDEN_IDS.indexOf(p.id) === -1 && !SKIP_LAUNCHPOINT.test(p.id));
+		if (!points.length) throw new Error('no launch points');
+		return points.map((p): AppEntry => {
+			const known = findCatalog(p.id);
+			const lgIcon = p.largeIcon || p.icon;
+			return {
+				id: p.id,
+				aliases: known ? idsOf(known) : [p.id],
+				title: known ? known.title : p.title,
+				// our bundled artwork first; LG's own icon file otherwise (readable from file:// on webOS 4/5)
+				iconUrl: known && known.icon ? ICON_DIR + known.icon : lgIcon && SAFE_PATH.test(lgIcon) ? `file://${lgIcon}` : undefined,
+				color: known && known.color,
+				fg: known && known.fg,
+				brand: known && (known.brand || known.color),
+				tagline: known && known.tagline
+			};
+		});
+	});
 }
 
 // ---------- provider 2: Homebrew Channel (opt-in) ----------
@@ -85,9 +152,10 @@ function listViaHomebrew (): Promise<AppEntry[]> {
 			const points = (parsed.launchPoints || []).filter((p) => p.id && p.title && HIDDEN_IDS.indexOf(p.id) === -1);
 			if (!points.length) throw new Error('no launch points');
 			return loadIcons(points).then((icons) => points.map((p) => {
-				const known = APP_CATALOG.find((c) => c.id === p.id);
+				const known = findCatalog(p.id);
 				return {
 					id: p.id,
+					aliases: known ? idsOf(known) : [p.id],
 					// the catalogue's titles are shorter than LG's ("IPTV Player" vs "webOS IPTV Player")
 					title: known ? known.title : p.title,
 					iconUrl: icons[p.id] || (known && known.icon ? ICON_DIR + known.icon : undefined),

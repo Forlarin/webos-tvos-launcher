@@ -1,13 +1,20 @@
 import {useEffect, useState} from 'preact/hooks';
-import {TIMING} from '../config/constants';
 
-/** Current time, re-rendered once a second (only changes when the minute changes
- *  matter to the UI, but a 1s tick keeps the displayed minute exact). */
+/** Current time, re-rendered on each minute boundary. Nothing shows seconds, and on slow
+ *  TVs a once-a-second re-render of the home screen is measurable. */
 export function useClock (): Date {
 	const [now, setNow] = useState(() => new Date());
 	useEffect(() => {
-		const id = window.setInterval(() => setNow(new Date()), TIMING.clockTickMs);
-		return () => window.clearInterval(id);
+		let timer = 0;
+		const schedule = () => {
+			const d = new Date();
+			timer = window.setTimeout(() => { setNow(new Date()); schedule(); }, 60000 - d.getSeconds() * 1000 - d.getMilliseconds() + 50);
+		};
+		schedule();
+		// Catch up straight away when coming back (timers may have been paused).
+		const onVisible = () => { if (!document.hidden) setNow(new Date()); };
+		document.addEventListener('visibilitychange', onVisible);
+		return () => { window.clearTimeout(timer); document.removeEventListener('visibilitychange', onVisible); };
 	}, []);
 	return now;
 }

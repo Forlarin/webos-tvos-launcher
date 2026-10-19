@@ -14,11 +14,20 @@
 
 export interface CatalogApp {
 	id: string;
+	/** other IDs the same app has shipped under (by region or over the years); the first
+	 *  one installed is used */
+	altIds?: string[];
 	title: string;
 	/** file name under icons/apps/ (omit for a monogram tile) */
 	icon?: string;
-	/** monogram background when there is no icon */
+	/** wordmark tile background when there is no icon */
 	color?: string;
+	/** wordmark text colour (default white) */
+	fg?: string;
+	/** brand colour for the top-shelf wash (defaults to `color`) */
+	brand?: string;
+	/** one line under the name in the top shelf */
+	tagline?: string;
 }
 
 /** Shape of the optional src/config/catalog.local.ts. */
@@ -31,17 +40,19 @@ export interface LocalCatalog {
 
 const BASE_CATALOG: CatalogApp[] = [
 	// Global streaming
-	{id: 'youtube.leanback.v4', title: 'YouTube', icon: 'youtube.leanback.v4.png'},
-	{id: 'netflix', title: 'Netflix', color: '#b1060f'},
-	{id: 'amazon', title: 'Prime Video', icon: 'amazon.png'},
-	{id: 'com.disney.disneyplus-prod', title: 'Disney+', color: '#0f2b6b'},
-	{id: 'com.apple.appletv', title: 'Apple TV', icon: 'com.apple.appletv.png'},
-	{id: 'com.wbd.stream', title: 'Max', color: '#002be7'},
-	{id: 'cdp-30', title: 'Plex', icon: 'cdp-30.png'},
-	{id: 'spotify-beehive', title: 'Spotify', color: '#1db954'},
+	{id: 'youtube.leanback.v4', title: 'YouTube', icon: 'youtube.leanback.v4.png', brand: '#ff0033', tagline: 'Videos, music and live streams'},
+	{id: 'netflix', title: 'Netflix', color: '#000000', fg: '#e50914', brand: '#e50914', tagline: 'Series, films and games'},
+	{id: 'amazon', title: 'Prime Video', icon: 'amazon.png', brand: '#1a98ff', tagline: 'Movies, series and live sport'},
+	{id: 'com.disney.disneyplus-prod', title: 'Disney+', color: '#0b1b4f', brand: '#1f5fd6', tagline: 'Disney, Pixar, Marvel and Star Wars'},
+	{id: 'com.apple.appletv', title: 'Apple TV', icon: 'com.apple.appletv.png', brand: '#9aa3b5', tagline: 'Apple Originals, movies and Friday Night Baseball'},
+	{id: 'com.wbd.stream', altIds: ['com.hbo.hbomax', 'hbomax'], title: 'max', color: '#002be7', tagline: 'HBO, blockbusters and series'},
+	{id: 'com.peacocktv.peacocktv', altIds: ['com.peacocktv.peacock', 'com.peacock.tv', 'peacock'], title: 'Peacock', color: '#000000', brand: '#6c5cff', tagline: 'NBC shows, films and live sport'},
+	{id: 'com.cbs-ott.2', altIds: ['com.paramount.paramountplus', 'com.cbsinteractive.cbsaa', 'cbsaa', 'cbs-all-access'], title: 'Paramount+', color: '#0064ff', tagline: 'CBS, Paramount films and live sport'},
+	{id: 'cdp-30', title: 'Plex', icon: 'cdp-30.png', brand: '#e5a00d', tagline: 'Your own films, shows and music'},
+	{id: 'spotify-beehive', title: 'Spotify', color: '#121212', fg: '#1ed760', brand: '#1ed760', tagline: 'Music and podcasts'},
 	{id: 'tv.twitch.tv.starshot.lg', title: 'Twitch', icon: 'tv.twitch.tv.starshot.lg.png'},
 	// North America
-	{id: 'hulu', title: 'Hulu', color: '#1ce783'},
+	{id: 'hulu', title: 'hulu', color: '#1ce783', fg: '#0b0c0f', tagline: 'Current TV, originals and films'},
 	{id: 'youtube.leanback.ytv.v1', title: 'YouTube TV', color: '#cc0000'},
 	{id: 'com.plutotv.app', title: 'Pluto TV', color: '#2b2b2b'},
 	{id: 'com.tubitv.ott.tubi', title: 'Tubi', color: '#7408ff'},
@@ -56,7 +67,7 @@ const BASE_CATALOG: CatalogApp[] = [
 	{id: 'com.fvp.uktv', title: 'UKTV Play', icon: 'com.fvp.uktv.png'},
 	{id: 'now.tv', title: 'NOW', icon: 'now.tv.png'},
 	// LG built-ins
-	{id: 'com.webos.app.browser', title: 'Browser', icon: 'com.webos.app.browser.png'},
+	{id: 'com.webos.app.browser', title: 'Web Browser', icon: 'com.webos.app.browser.png', brand: '#2f8cff', tagline: 'Browse the web'},
 	{id: 'com.webos.app.mediadiscovery', title: 'Media Player', icon: 'com.webos.app.mediadiscovery.png'},
 	{id: 'com.webos.app.igallery', title: 'Art Gallery', icon: 'com.webos.app.igallery.png'},
 	{id: 'com.webos.app.homeconnect', title: 'Home Dashboard', icon: 'com.webos.app.homeconnect.png'},
@@ -72,8 +83,9 @@ const BASE_CATALOG: CatalogApp[] = [
 
 /** Apps shown on a fresh install, in row order. Anything not installed is skipped. */
 const BASE_DEFAULT_APP_IDS: string[] = [
-	'youtube.leanback.v4', 'netflix', 'amazon', 'com.disney.disneyplus-prod',
-	'com.apple.appletv', 'com.wbd.stream', 'cdp-30', 'spotify-beehive'
+	'netflix', 'youtube.leanback.v4', 'amazon', 'com.disney.disneyplus-prod', 'hulu',
+	'com.wbd.stream', 'com.apple.appletv', 'com.peacocktv.peacocktv', 'com.cbs-ott.2',
+	'spotify-beehive', 'com.webos.app.browser'
 ];
 
 // Vite resolves this at build time; it's an empty object when the file doesn't exist.

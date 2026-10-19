@@ -7,3 +7,6 @@ build/
 # local, per-person settings
 tv.env
 src/config/catalog.local.ts
+.claude/
+public/devmode.json
+backups/

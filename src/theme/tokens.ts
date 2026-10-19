@@ -28,8 +28,8 @@ export const COLOR = {
 } as const;
 
 export const FONT = {
-	family: '"Inter Variable", "LG Smart UI", "Helvetica Neue", Arial, sans-serif',
-	greeting: 72,
+	family: 'Inter, "LG Smart UI", "Helvetica Neue", Arial, sans-serif',
+	greeting: 30,
 	clock: 32,
 	clockTime: 44,
 	rowLabel: 20,
@@ -46,21 +46,25 @@ export const FONT = {
 export const LAYOUT = {
 	screenWidth: 1920,
 	screenHeight: 1080,
-	edgePadding: 140,       // heavy padding around the screen edges
+	edgePadding: 120,       // heavy padding around the screen edges
 	headerTop: 84,
 	rowsTop: 236,           // rows start here, below the greeting and clock
-	tileSize: 144,          // app / source tiles are square
+	tileSize: 132,          // source tiles and the settings grid are square
+	dockTileSize: 156,
+	wideTileWidth: 248,     // 16:9 input cards (height 140)      // favourites in the dock
+	wallpaperCardWidth: 720,
 	tileGap: 28,
 	tileRadius: 24,
 	rowLabelGap: 14,        // gap between a row's subheader and its tiles
 	rowGap: 28,             // vertical space between rows
-	gridColumns: 9          // settings picker grid
+	gridColumns: 9          // settings picker grid (also .grid__track nth-child(9n) in global.css)
 } as const;
 
 export const MOTION = {
 	focusMs: 160,
 	scrollMs: 260,
-	focusScale: 1.12,
+	focusScale: 1.14,
+	nearScale: 1.05,        // neighbours of the focused tile (magnifying dock)
 	liftScale: 1.2,         // a tile picked up in re-order mode
 	unfocusedRowOpacity: 0.55
 } as const;
