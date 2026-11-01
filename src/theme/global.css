@@ -592,3 +592,65 @@ html, body {
 .editor__done--focused { background: #fff; color: #111; transform: scale(1.06); }
 .editor__hint { margin-left: 30px; font-size: 19px; color: rgba(255, 255, 255, 0.55); }
 
+
+/* ---------- Liquid Glass (lib/glass.ts) ----------
+   Works without backdrop-filter: each surface paints a blurred, vivid copy of the
+   wallpaper (--glass-img), lined up with the screen by alignGlass(). Three layers: a
+   diagonal sheen, a tint for legibility, the wallpaper copy. Edges get a bright top
+   highlight and a faint inner rim, which is most of what makes glass read as glass. */
+.app--liquid .dock,
+.app--liquid .pill,
+.app--liquid .row--wide .tile__box,
+.app--liquid .panel,
+.app--liquid .settings,
+.app--liquid .editor,
+.app--liquid .pin {
+	--tint: rgba(14, 14, 22, 0.30);
+	background-color: transparent;
+	background-image:
+		linear-gradient(155deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 60%),
+		linear-gradient(var(--tint), var(--tint)),
+		var(--glass-img);
+	background-size: 100% 100%, 100% 100%, 1920px 1080px;
+	background-repeat: no-repeat;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	box-shadow:
+		inset 0 1.5px 0 rgba(255, 255, 255, 0.50),
+		inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+		inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+		inset 0 0 24px rgba(255, 255, 255, 0.06),
+		0 18px 50px rgba(0, 0, 0, 0.35);
+}
+/* text-heavy surfaces: deeper tint so text stays easy to read */
+.app--liquid .panel,
+.app--liquid .settings,
+.app--liquid .editor,
+.app--liquid .pin { --tint: rgba(12, 12, 20, 0.62); }
+.app--liquid .row--wide .tile__box { --tint: rgba(14, 14, 22, 0.38); }
+.app--light.app--liquid .dock,
+.app--light.app--liquid .pill,
+.app--light.app--liquid .row--wide .tile__box { --tint: rgba(255, 255, 255, 0.10); }
+
+/* focus stays crisp and solid */
+.app--liquid .pill--focused { background-image: none; background-color: rgba(255, 255, 255, 0.94); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); }
+.app--liquid .tile--focused .tile__box { box-shadow: 0 0 0 4px #fff, inset 0 1.5px 0 rgba(255, 255, 255, 0.5), 0 22px 50px rgba(0, 0, 0, 0.5); }
+/* Icons animate on their own GPU layers, so focus moves don't repaint the glass behind them */
+.app--liquid .row__track .tile__box { will-change: transform; }
+
+/* Lite + glass: keep the crisp 1px edge lines (cheap), drop blurred shadows and inner
+   glows. Measured on the UM7300: blurred shadows cost ~15-20 ms per focus move. */
+.app--lite.app--liquid .dock,
+.app--lite.app--liquid .pill,
+.app--lite.app--liquid .row--wide .tile__box,
+.app--lite.app--liquid .panel,
+.app--lite.app--liquid .settings,
+.app--lite.app--liquid .editor,
+.app--lite.app--liquid .pin {
+	box-shadow:
+		inset 0 1.5px 0 rgba(255, 255, 255, 0.50),
+		inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+		inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+.app--lite.app--liquid .pill--focused { box-shadow: none; }
+.app--lite.app--liquid .tile--focused .tile__box { box-shadow: 0 0 0 4px #fff, inset 0 1.5px 0 rgba(255, 255, 255, 0.5); }

@@ -27,7 +27,8 @@ import {
 	activeProfile, loadHousehold, saveHousehold, toggleId, updateProfile,
 	type Household, type Profile, type Rotation
 } from './lib/storage';
-import {DAILY_ID, dailyIndex, findWallpaper, seasonalWallpaperId, WALLPAPERS} from './lib/wallpapers';
+import {DAILY_ID, dailyIndex, findWallpaper, seasonalWallpaperId, wallpaperUrl, WALLPAPERS} from './lib/wallpapers';
+import {alignGlass, glassImage} from './lib/glass';
 import {appTile, inputTile, pickAppsInOrder, pickInOrder} from './lib/tiles';
 import {DEFAULT_APP_IDS} from './config/catalog';
 import {SYSTEM_APP, TIMING} from './config/constants';
@@ -107,6 +108,8 @@ export function App () {
 	const [apodVersion, setApodVersion] = useState(0);
 	const [profilesEntry, setProfilesEntry] = useState<{id?: string; editName?: boolean; back: Screen}>({back: 'home'});
 	const toastTimer = useRef(0);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const [glassImg, setGlassImg] = useState<string | null>(null);
 	const lastInput = useRef(Date.now());
 
 	const profile = activeProfile(household);
@@ -256,7 +259,7 @@ export function App () {
 		{id: 'density', section: 'Home screen', label: 'Layout', description: 'Spacious uses larger dock icons; Compact fits more on screen.', value: household.density === 'spacious' ? 'Spacious' : 'Compact'},
 		{id: 'clock', label: 'Clock style', description: 'The clock on the home screen.', value: household.clockStyle === 'thin' ? 'Thin' : 'Bold'},
 		{id: 'motion', label: 'Animations', description: 'Slow wallpaper drift, twinkling stars and smooth transitions. Turn off on a slow TV.', value: household.motion},
-		{id: 'glass', label: 'Frosted glass', description: 'Blurred glass behind panels. Costs the most GPU time; turn off if navigation feels slow.', value: household.glass},
+		{id: 'glass', label: 'Liquid Glass', description: 'The dock, buttons, cards and panels look like glass, with the wallpaper glowing through. Off gives plain tinted panels.', value: household.glass},
 		{id: 'restore', label: 'Restore default favourites', description: 'Puts this profile’s dock back to the original apps and order.', value: null},
 		{id: 'manage', section: 'Profiles', label: 'Manage profiles', description: 'Add, rename and delete profiles; change avatars, colours, Kids mode and the default profile.', value: null},
 		{id: 'ask', label: 'Ask “Who’s Watching?”', description: 'When the launcher opens, and when you come back after four hours away.', value: household.askOnLaunch},
@@ -348,17 +351,37 @@ export function App () {
 	const ambient = findWallpaper(wallpaperId).accent;
 	const sub = screen === 'settings' || screen === 'profiles' || screen === 'apps' || (screen === 'wallpapers' && !previewId);
 	const overlayActive = !!pinRequest || saver;
+	// Liquid Glass: a blurred copy of the wallpaper on screen (made once per wallpaper)
+	useEffect(() => {
+		if (!household.glass) { setGlassImg(null); return; }
+		let live = true;
+		glassImage(wallpaperUrl(wallpaperId)).then((url) => { if (live) setGlassImg(url); });
+		return () => { live = false; };
+	}, [wallpaperId, apodVersion, household.glass]);
+
+	// …lined up behind each glass surface whenever the layout may have changed (and again
+	// once screen-entry animations have settled).
+	const liquid = household.glass && !!glassImg;
+	useEffect(() => {
+		if (!liquid || !rootRef.current) return;
+		const root = rootRef.current;
+		alignGlass(root);
+		const t = window.setTimeout(() => alignGlass(root), 500);
+		return () => window.clearTimeout(t);
+	}, [liquid, glassImg, screen, profile.id, previewId, !!pinRequest, inputs.length, apps.length, network.label]);
+
 	const rootClass = [
 		'app',
 		household.density === 'compact' && 'app--compact',
 		!household.motion && 'app--still',
 		LITE && 'app--lite',
 		!household.glass && 'app--noglass',
+		liquid && 'app--liquid',
 		profile.appearance === 'light' && 'app--light'
 	].filter(Boolean).join(' ');
 
 	return (
-		<div class={rootClass} style={{'--accent': profile.accent, '--ambient': ambient}}>
+		<div ref={rootRef} class={rootClass} style={{'--accent': profile.accent, '--ambient': ambient, '--glass-img': glassImg ? `url("${glassImg}")` : 'none'}}>
 			<Backdrop key={wallpaperId === DAILY_ID ? `daily-${apodVersion}` : 'backdrop'} wallpaperId={wallpaperId} dim={screen === 'picker' ? Math.max(profile.dim, 45) : profile.dim} motion={household.motion} blurred={sub} light={profile.appearance === 'light'} />
 
 			{/* Home stays mounted under the other screens so it keeps its focus position. */}
