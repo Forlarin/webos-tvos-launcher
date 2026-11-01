@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
 import {Avatar, AVATARS} from '../components/Avatar';
 import {useKeys, clamp, type NavKey} from '../hooks/useKeys';
+import {useKeyboardClose} from '../hooks/useKeyboardClose';
 import {KEY} from '../config/constants';
 import {ACCENTS, makeProfile, updateProfile, type Household, type Profile} from '../lib/storage';
 
@@ -104,6 +105,8 @@ export function Profiles ({household, initialId, editNameFirst, active, onChange
 		setEditing(false);
 	};
 
+	useKeyboardClose(commitName, editing);
+
 	const handleKey = useCallback((key: NavKey): boolean => {
 		if (key === 'back') {
 			if (zone === 'fields') setZone('profiles');
@@ -138,7 +141,7 @@ export function Profiles ({household, initialId, editNameFirst, active, onChange
 					defaultValue={selected.name}
 					maxLength={20}
 					onKeyDown={(e) => {
-						if (e.keyCode === KEY.enter) { e.preventDefault(); commitName(); }
+						if (e.keyCode === KEY.enter || e.keyCode === KEY.up || e.keyCode === KEY.down) { e.preventDefault(); commitName(); }
 						else if (e.keyCode === KEY.back || e.keyCode === KEY.escape) { e.preventDefault(); setEditing(false); }
 					}}
 					onBlur={commitName}

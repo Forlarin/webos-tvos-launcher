@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'preact/hooks';
 import {Avatar, AVATARS} from '../components/Avatar';
 import {useKeys, clamp, type NavKey} from '../hooks/useKeys';
+import {useKeyboardClose} from '../hooks/useKeyboardClose';
 import {KEY} from '../config/constants';
 import type {Profile} from '../lib/storage';
 
@@ -35,6 +36,8 @@ export function ProfileEditor ({profile, active, onSave, onClose}: Props) {
 		if (v) setName(v);
 		setEditing(false);
 	};
+
+	useKeyboardClose(finishName, editing);
 
 	useKeys((key: NavKey) => {
 		if (key === 'back') { onClose(); return true; }
@@ -79,6 +82,8 @@ export function ProfileEditor ({profile, active, onSave, onClose}: Props) {
 									maxLength={20}
 									onKeyDown={(e) => {
 										if (e.keyCode === KEY.enter) { e.preventDefault(); finishName(); }
+										else if (e.keyCode === KEY.down) { e.preventDefault(); finishName(); setZone('grid'); }
+										else if (e.keyCode === KEY.up) { e.preventDefault(); finishName(); }
 										else if (e.keyCode === KEY.back || e.keyCode === KEY.escape) { e.preventDefault(); setEditing(false); }
 									}}
 									onBlur={finishName}
