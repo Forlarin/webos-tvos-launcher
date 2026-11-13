@@ -66,6 +66,14 @@ const BASE_CATALOG: CatalogApp[] = [
 	{id: 'demand5', title: 'Channel 5', icon: 'demand5.png'},
 	{id: 'com.fvp.uktv', title: 'UKTV Play', icon: 'com.fvp.uktv.png'},
 	{id: 'now.tv', title: 'NOW', icon: 'now.tv.png'},
+	// Spain
+	// IDs verified on an LG OLED C1 (OLED65C14LB, webOS 6.5.3) by reading the live
+	// app list over SSAP (applicationManager/listApps). As elsewhere, an app a TV
+	// doesn't have is skipped at runtime via getAppLoadStatus.
+	{id: 'com.telefonica.app.nux', title: 'Movistar Plus+', color: '#00a3a0', brand: '#00c2bd', tagline: 'LaLiga, series, films and originals'},
+	{id: 'dazn', title: 'DAZN', color: '#0a0a0a', fg: '#f8f80a', brand: '#f8f80a', tagline: 'Live football and combat sport'},
+	{id: 'com.skyshowtime.tv', title: 'SkyShowtime', color: '#5b2bd9', tagline: 'Peacock, Paramount and Sky originals'},
+	{id: 'ui30', title: 'Rakuten TV', color: '#15002b', brand: '#e50050', tagline: 'Free films, plus rentals and buys'},
 	// LG built-ins
 	{id: 'com.webos.app.browser', title: 'Web Browser', icon: 'com.webos.app.browser.png', brand: '#2f8cff', tagline: 'Browse the web'},
 	{id: 'com.webos.app.mediadiscovery', title: 'Media Player', icon: 'com.webos.app.mediadiscovery.png'},
